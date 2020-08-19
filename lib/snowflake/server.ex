@@ -1,7 +1,11 @@
 defmodule Shiori.Snowflake.Server do
   use GenServer
-
   alias Shiori.Snowflake.Node, as: Node
+
+  @moduledoc """
+  GenServer to generate unique snowflake IDs
+  based on the node state hold by the GenServer.
+  """
 
   def init(args) do
     {:ok, args}
@@ -20,6 +24,10 @@ defmodule Shiori.Snowflake.Server do
     {:reply, id, node}
   end
 
+  @doc """
+  Sends a get_id call to the specified GenServer
+  instance and returns the retrieved value.
+  """
   def get_id(server) do
     GenServer.call(server, {:get_id})
   end
