@@ -17,12 +17,31 @@ defmodule Shiori.WS.Router do
   plug(:dispatch)
 
   ###############################################################
+  #  GET /api/links
+  #                ?limit=number(100)
+  #                ?offset=number(0)
+  ###############################################################
+
+  get "#{@prefix}/links" do
+    conn |> fetch_query_params()
+    limit = conn.query_params |> Map.get("limit", 100)
+    offset = conn.query_params |> Map.get("offset", 0)
+
+    case Meilisearch.Document.list("links", limit: limit, offset: offset) do
+      {:error, 404, _err} -> conn |> resp_json_not_found()
+      {:error, _code, err} -> conn |> resp_json_error(500, err)
+      {:ok, docs} -> docs |> resp_json_ok(conn)
+    end
+  end
+
+  ###############################################################
   #  GET /api/links/:id
   ###############################################################
 
   get "#{@prefix}/links/:id" do
     case Meilisearch.Document.get("links", id) do
       {:error, 404, _err} -> conn |> resp_json_not_found()
+      {:error, _code, err} -> conn |> resp_json_error(500, err)
       {:ok, doc} -> doc |> resp_json_ok(conn)
     end
   end
