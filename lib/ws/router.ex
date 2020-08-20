@@ -4,6 +4,7 @@ defmodule Shiori.WS.Router do
   import Shiori.WS.Util
 
   alias Shiori.Models.Link, as: Link
+  alias Shiori.Models.SearchResult, as: SearchResult
   alias Shiori.Snowflake.Server, as: SnowflakeServer
 
   use Plug.Router
@@ -40,7 +41,7 @@ defmodule Shiori.WS.Router do
          ) do
       {:error, 404, _err} -> conn |> resp_json_not_found()
       {:error, _code, err} -> conn |> resp_json_error(500, err)
-      {:ok, docs} -> docs |> resp_json_ok(conn)
+      {:ok, docs} -> docs |> Link.add_id_str() |> resp_json_ok(conn)
     end
   end
 
@@ -67,9 +68,17 @@ defmodule Shiori.WS.Router do
            limit: limit,
            offset: offset
          ) do
-      {:error, 404, _err} -> conn |> resp_json_not_found()
-      {:error, _code, err} -> conn |> resp_json_error(500, err)
-      {:ok, docs} -> docs |> resp_json_ok(conn)
+      {:error, 404, _err} ->
+        conn |> resp_json_not_found()
+
+      {:error, _code, err} ->
+        conn |> resp_json_error(500, err)
+
+      {:ok, res} ->
+        res
+        |> SearchResult.from_map()
+        |> SearchResult.add_id_str()
+        |> resp_json_ok(conn)
     end
   end
 
@@ -81,7 +90,7 @@ defmodule Shiori.WS.Router do
     case Meilisearch.Document.get("links", id) do
       {:error, 404, _err} -> conn |> resp_json_not_found()
       {:error, _code, err} -> conn |> resp_json_error(500, err)
-      {:ok, doc} -> doc |> resp_json_ok(conn)
+      {:ok, doc} -> doc |> Link.add_id_str() |> resp_json_ok(conn)
     end
   end
 
@@ -108,7 +117,7 @@ defmodule Shiori.WS.Router do
 
     case Meilisearch.Document.add_or_replace("links", [link]) do
       {:error, err} -> conn |> resp_json_error(500, err)
-      {:ok, _} -> link |> resp_json(conn, 201)
+      {:ok, _} -> link |> Link.add_id_str() |> resp_json(conn, 201)
     end
   end
 
@@ -139,7 +148,7 @@ defmodule Shiori.WS.Router do
             conn |> resp_json_error(500, err)
 
           {:ok, _} ->
-            link |> resp_json_ok(conn)
+            link |> Link.add_id_str() |> resp_json_ok(conn)
         end
     end
   end
