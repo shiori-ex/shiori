@@ -145,6 +145,20 @@ defmodule Shiori.WS.Router do
   end
 
   ###############################################################
+  #  DELETE /api/links/:id
+  ###############################################################
+
+  delete "#{@prefix}/links/:id" do
+    case Meilisearch.Document.delete("links", id) do
+      {:error, err} ->
+        conn |> resp_json_error(500, err)
+
+      {:ok, _} ->
+        conn |> resp_json_ok()
+    end
+  end
+
+  ###############################################################
   #  FALLBACK
   ###############################################################
 
