@@ -108,7 +108,7 @@ defmodule Shiori.WS.Router do
 
     case Meilisearch.Document.add_or_replace("links", [link]) do
       {:error, err} -> conn |> resp_json_error(500, err)
-      {:ok, _} -> link |> resp_json(201, conn)
+      {:ok, _} -> link |> resp_json(conn, 201)
     end
   end
 
