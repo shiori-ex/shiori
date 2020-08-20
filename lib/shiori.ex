@@ -7,6 +7,10 @@ defmodule Shiori.Application do
   use Application
 
   def start(_type, _args) do
+    if get_sub(WS, :token, []) |> length < 1 do
+      raise "At least one REST API token must be specified"
+    end
+
     children = [
       {
         Shiori.Snowflake.Server,

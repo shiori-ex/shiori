@@ -56,7 +56,6 @@ defmodule Shiori.WS.Router do
     query = conn.query_params |> Map.get("query")
     limit = conn.query_params |> Map.get("limit", 100)
     offset = conn.query_params |> Map.get("offset", 0)
-    IO.puts(query)
 
     if query == nil or query == "" do
       conn |> resp_json_error(401, "invalid query")

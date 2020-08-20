@@ -13,12 +13,23 @@ port =
     {:error} -> raise "invalid config value for port; must be numeral"
   end
 
+token =
+  System.get_env("SHIORI_WS_TOKEN", "")
+  |> String.split(" ")
+  |> Enum.filter(fn x -> x |> String.length() > 0 end)
+
 config :shiori, WS,
+  # :http or :https
   scheme: scheme,
+  # integer
   port: port,
-  token: System.get_env("SHIORI_WS_TOKEN", "token"),
+  # string list
+  token: token,
+  # string, should start with "/"
   prefix: System.get_env("SHIORI_WS_PREFIX", "")
 
 config :meilisearch,
+  # URL
   endpoint: System.get_env("SHIORI_MEILI_ADDRESS"),
+  # string
   api_key: System.get_env("SHIORI_MEILI_KEY")

@@ -19,12 +19,9 @@ defmodule Shiori.WS.Auth.Basic do
   end
 
   defp check_token(token, conn) do
-    must_token = Shiori.Config.get_sub(WS, :token, "")
-
-    if token == must_token do
-      conn
-    else
-      conn |> resp_json_unauthorized() |> halt()
-    end
+    if Shiori.Config.get_sub(WS, :token, [])
+       |> Enum.any?(fn x -> x == token end),
+       do: conn,
+       else: conn |> resp_json_unauthorized() |> halt()
   end
 end
