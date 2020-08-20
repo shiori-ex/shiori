@@ -35,6 +35,31 @@ defmodule Shiori.WS.Router do
   end
 
   ###############################################################
+  #  GET /api/links/search
+  #                       ?query=string
+  #                       ?limit=number(100)
+  #                       ?offset=number(0)
+  ###############################################################
+
+  get "#{@prefix}/links/search" do
+    conn |> fetch_query_params()
+    query = conn.query_params |> Map.get("query")
+    limit = conn.query_params |> Map.get("limit", 100)
+    offset = conn.query_params |> Map.get("offset", 0)
+    IO.puts(query)
+
+    if query == nil or query == "" do
+      conn |> resp_json_error(401, "invalid query")
+    end
+
+    case Meilisearch.Search.search("links", query, limit: limit, offset: offset) do
+      {:error, 404, _err} -> conn |> resp_json_not_found()
+      {:error, _code, err} -> conn |> resp_json_error(500, err)
+      {:ok, docs} -> docs |> resp_json_ok(conn)
+    end
+  end
+
+  ###############################################################
   #  GET /api/links/:id
   ###############################################################
 
