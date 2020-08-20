@@ -11,7 +11,13 @@ defmodule Shiori.WS.Router do
 
   @prefix Shiori.Config.get_sub(WS, :prefix, "/api")
 
-  plug(Plug.Parsers, parsers: [:json], pass: ["text/*"], json_decoder: Jason)
+  plug(
+    Plug.Parsers,
+    parsers: [:json],
+    pass: ["text/*"],
+    json_decoder: Jason
+  )
+
   plug(Shiori.WS.Auth.Basic)
   plug(:match)
   plug(:dispatch)
@@ -27,7 +33,11 @@ defmodule Shiori.WS.Router do
     limit = conn.query_params |> Map.get("limit", 100)
     offset = conn.query_params |> Map.get("offset", 0)
 
-    case Meilisearch.Document.list("links", limit: limit, offset: offset) do
+    case Meilisearch.Document.list(
+           "links",
+           limit: limit,
+           offset: offset
+         ) do
       {:error, 404, _err} -> conn |> resp_json_not_found()
       {:error, _code, err} -> conn |> resp_json_error(500, err)
       {:ok, docs} -> docs |> resp_json_ok(conn)
@@ -52,7 +62,12 @@ defmodule Shiori.WS.Router do
       conn |> resp_json_error(401, "invalid query")
     end
 
-    case Meilisearch.Search.search("links", query, limit: limit, offset: offset) do
+    case Meilisearch.Search.search(
+           "links",
+           query,
+           limit: limit,
+           offset: offset
+         ) do
       {:error, 404, _err} -> conn |> resp_json_not_found()
       {:error, _code, err} -> conn |> resp_json_error(500, err)
       {:ok, docs} -> docs |> resp_json_ok(conn)
