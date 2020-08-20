@@ -1,0 +1,24 @@
+name: Docker CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  releases-deploy:
+
+    name: Docker Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build and Publish Docker Image
+        run: |
+          docker build . -t shioriex/shiori:latest
+          docker login -u zekro -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push shioriex/shiori:latest
