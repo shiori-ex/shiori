@@ -19,7 +19,8 @@ defmodule Shiori.Snowflake.Node do
   #
   #   Snowflake ID Structure
   #
-  #   | 64..22 | 22..13 | 12..0 |
+  #   | < 42 > | < 10 > | < 12 > |
+  #   | 64..22 | 22..13 | 12..00 |
   #     ^        ^        ^
   #     |        |        +- Increment
   #     |        +---------- Node ID
@@ -31,9 +32,11 @@ defmodule Shiori.Snowflake.Node do
   # Mon Jul 11 09:19:55 52603 UTC
   @epoche 1_597_839_643_195
   @increment_bits 12
+  @increment_max -1 ^^^ (-1 <<< @increment_bits)
+  @increment_mask @increment_max
   @node_bits 10
-  @increment_max :math.pow(2, @increment_bits) - 1
-  @node_max :math.pow(2, @node_bits) - 1
+  @node_max -1 ^^^ (-1 <<< @node_bits)
+  @node_mask @node_max <<< @increment_bits
 
   @doc """
   Generates a unique snowflake ID by the current
@@ -50,6 +53,7 @@ defmodule Shiori.Snowflake.Node do
   increment exceeds the specified max value for
   the increment number.
   """
+  @spec generate(__MODULE__) :: {__MODULE__, integer()}
   def generate(node) do
     if node.id > @node_max do
       raise "Node max (#{@node_max}) exceeded"
@@ -67,6 +71,31 @@ defmodule Shiori.Snowflake.Node do
       %{node | increment: 0, last_timestamp: now} |> get_id(now)
     end
   end
+
+  @doc """
+  Returns the timestamp in milliseconds of the passed
+  snowflake ID when the ID was generated.
+  """
+  @spec get_timestamp(integer()) :: integer()
+  def get_timestamp(id), do: (id >>> (@increment_bits + @node_bits)) + @epoche
+
+  @doc """
+  Returns the node ID of the passed snowflake ID
+  which was used to generate the ID.
+  """
+  @spec get_nodeid(integer()) :: integer()
+  def get_nodeid(id), do: (id &&& @node_mask) >>> @increment_bits
+
+  @doc """
+  Returns the increment number of the passed snowflake
+  ID which was assigned when it was created.
+
+  This number can be interpreted as the (n + 1)th ID
+  generated on the same node in between the same
+  millisecond.
+  """
+  @spec get_increment(integer()) :: integer()
+  def get_increment(id), do: id &&& @increment_mask
 
   defp get_id(node, now) do
     id =
