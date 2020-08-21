@@ -2,6 +2,10 @@ defmodule Shiori.WS.Auth.Basic do
   import Plug.Conn
   import Shiori.WS.Util
 
+  @moduledoc """
+  Basic token authorization plug.
+  """
+
   def init(opts), do: opts
 
   def call(conn, _opts) do

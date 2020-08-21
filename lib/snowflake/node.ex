@@ -97,6 +97,9 @@ defmodule Shiori.Snowflake.Node do
   @spec get_increment(integer()) :: integer()
   def get_increment(id), do: id &&& @increment_mask
 
+  # Returns the compiled snowflake ID from the given
+  # node state and current timestamp.
+  @spec get_id(__MODULE__, integer()) :: {__MODULE__, integer()}
   defp get_id(node, now) do
     id =
       now <<< (@increment_bits + @node_bits) |||

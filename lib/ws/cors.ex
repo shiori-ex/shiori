@@ -2,6 +2,12 @@ defmodule Shiori.WS.Cors do
   import Plug.Conn
   import Shiori.WS.Util
 
+  @moduledoc """
+  Plug which adds CORS access control headers
+  when enabled by config and handles OPTIONS
+  API requests.
+  """
+
   @cors_origin Shiori.Config.get_sub(WS, :cors_origin)
 
   def init(opts), do: opts
