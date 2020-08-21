@@ -32,9 +32,37 @@ defmodule Shiori.Models.Link do
     }
   end
 
-  def add_id_str(node) when is_map(node),
-    do: node |> Map.put("id_str", Integer.to_string(node["id"]))
+  @doc """
+  Adds a field named "id_str" to the passed map which
+  contains the integer value from the "id" field of
+  the map.
+  """
+  @spec add_id_str(map()) :: map()
+  def add_id_str(link_map) when is_map(link_map),
+    do: link_map |> Map.put("id_str", Integer.to_string(link_map["id"]))
 
-  def add_id_str(node) when is_list(node),
-    do: node |> Enum.map(&add_id_str/1)
+  @doc """
+  Adds a field named "id_str" to each map of the list
+  of maps which contains the integer value from the "id"
+  field of the map elements.
+  """
+  @spec add_id_str(list(map())) :: list(map())
+  def add_id_str(link_map_list) when is_list(link_map_list),
+    do: link_map_list |> Enum.map(&add_id_str/1)
+
+  @doc """
+  Returns true when the links URL matches a valid
+  URL pattern.
+  """
+  @spec valid?(map()) :: boolean()
+  def valid?(link_map) when is_map(link_map),
+    do: link_map["url"] || "" |> Shiori.Util.URL.valid?()
+
+  @doc """
+  Returns true when the links URL matches a valid
+  URL pattern.
+  """
+  @spec valid?(__MODULE__) :: boolean()
+  def valid?(link) when is_struct(link),
+    do: link.url || "" |> Shiori.Util.URL.valid?()
 end

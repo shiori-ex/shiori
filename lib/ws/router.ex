@@ -107,7 +107,7 @@ defmodule Shiori.WS.Router do
       |> Link.from_map()
       |> generate_and_set_id()
 
-    if link.url == nil or link.url == "" do
+    if not link |> Link.valid?() do
       conn |> resp_json_error(400, "invalid bookmark URL")
     end
 
@@ -133,7 +133,7 @@ defmodule Shiori.WS.Router do
       conn.body_params
       |> Link.from_map()
 
-    if link.url == nil or link.url == "" do
+    if not link |> Link.valid?() do
       conn |> resp_json_error(400, "invalid bookmark URL")
     end
 

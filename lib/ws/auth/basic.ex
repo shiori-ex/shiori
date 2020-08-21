@@ -5,13 +5,13 @@ defmodule Shiori.WS.Auth.Basic do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    case conn.req_headers |> Enum.find(&check_basic_auth(&1)) do
+    case conn.req_headers |> Enum.find(&basic_auth_valid?(&1)) do
       {_key, token} -> token |> String.slice(6..-1) |> check_token(conn)
       nil -> conn |> resp_json_unauthorized() |> halt()
     end
   end
 
-  defp check_basic_auth({k, v}) do
+  defp basic_auth_valid?({k, v}) do
     k == "authorization" &&
       v
       |> String.downcase()
