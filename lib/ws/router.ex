@@ -60,7 +60,7 @@ defmodule Shiori.WS.Router do
     offset = conn.query_params |> Map.get("offset", 0)
 
     if query == nil or query == "" do
-      conn |> resp_json_error(401, "invalid query")
+      conn |> resp_json_error(400, "invalid query")
     end
 
     case Meilisearch.Search.search(
@@ -108,7 +108,7 @@ defmodule Shiori.WS.Router do
       |> generate_and_set_id()
 
     if link.url == nil or link.url == "" do
-      conn |> resp_json_error(401, "invalid bookmark URL")
+      conn |> resp_json_error(400, "invalid bookmark URL")
     end
 
     case ensure_links_index() do
@@ -134,7 +134,7 @@ defmodule Shiori.WS.Router do
       |> Link.from_map()
 
     if link.url == nil or link.url == "" do
-      conn |> resp_json_error(401, "invalid bookmark URL")
+      conn |> resp_json_error(400, "invalid bookmark URL")
     end
 
     case Meilisearch.Document.get("links", id) do
