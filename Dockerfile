@@ -9,7 +9,8 @@ COPY mix.lock .
 
 RUN mix local.hex --force \
     && mix local.rebar --force \
-    && mix deps.get
+    && mix deps.get \
+    && mix deps.compile
 
 ENV SHIORI_WS_USEHTTPS="false" \
     SHIORI_WS_PORT="8080"
