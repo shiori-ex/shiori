@@ -25,7 +25,7 @@ defmodule ShioriTest.Snowflake.Node do
   test "get snowflake timestamp" do
     now = System.system_time(:millisecond)
     id = get_id(TestSnowflakeServer.General)
-    assert get_timestamp(id) == now
+    assert_in_delta get_timestamp(id), now, 1
 
     now = System.system_time(:millisecond)
     :timer.sleep(10)
@@ -42,7 +42,7 @@ defmodule ShioriTest.Snowflake.Node do
     0..5
     |> Enum.map(fn i -> {i, get_id(TestSnowflakeServer.Increments)} end)
     |> Enum.each(fn {i, id} ->
-      assert get_increment(id) == i
+      assert_in_delta get_increment(id), i, 1
     end)
   end
 end
