@@ -19,6 +19,7 @@ defmodule Shiori.WS.Router do
     json_decoder: Jason
   )
 
+  plug(Shiori.WS.Cors)
   plug(Shiori.WS.Auth.Basic)
   plug(:match)
   plug(:dispatch)

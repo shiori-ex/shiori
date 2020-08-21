@@ -26,7 +26,9 @@ config :shiori, WS,
   # string list
   token: token,
   # string, should start with "/"
-  prefix: System.get_env("SHIORI_WS_PREFIX", "")
+  prefix: System.get_env("SHIORI_WS_PREFIX", ""),
+  # string
+  cors_origin: System.get_env("SHIORI_WS_CORS_ORIGIN")
 
 config :meilisearch,
   # URL
