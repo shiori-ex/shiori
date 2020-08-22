@@ -107,7 +107,7 @@ defmodule Shiori.WS.Router do
       |> Link.from_map()
       |> generate_and_set_id()
 
-    if not link |> Link.valid?() do
+    if link |> Link.valid?() == false do
       conn |> resp_json_error(400, "invalid bookmark URL")
     end
 
@@ -133,7 +133,7 @@ defmodule Shiori.WS.Router do
       conn.body_params
       |> Link.from_map()
 
-    if not link |> Link.valid?() do
+    if link |> Link.valid?() == false do
       conn |> resp_json_error(400, "invalid bookmark URL")
     end
 
@@ -179,7 +179,7 @@ defmodule Shiori.WS.Router do
   Logger.info("WS running @ port #{Shiori.Config.get_sub(WS, :port, 8080)}")
 
   defp generate_and_set_id(obj) do
-    %{obj | id: SnowflakeServer.get_id(:snowflake_server)}
+    %Link{obj | id: SnowflakeServer.get_id(:snowflake_server)}
   end
 
   defp ensure_links_index() do

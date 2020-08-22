@@ -38,7 +38,16 @@ defmodule Shiori.Models.Link do
   the map.
   """
   @spec add_id_str(map()) :: map()
-  def add_id_str(link_map) when is_map(link_map),
+  def add_id_str(link) when is_struct(link),
+    do: %{link | id_str: Integer.to_string(link.id)}
+
+  @doc """
+  Adds a field named "id_str" to the passed map which
+  contains the integer value from the "id" field of
+  the map.
+  """
+  @spec add_id_str(map()) :: map()
+  def add_id_str(link_map) when is_map(link_map) and not is_struct(link_map),
     do: link_map |> Map.put("id_str", Integer.to_string(link_map["id"]))
 
   @doc """
@@ -54,15 +63,15 @@ defmodule Shiori.Models.Link do
   Returns true when the links URL matches a valid
   URL pattern.
   """
-  @spec valid?(map()) :: boolean()
-  def valid?(link_map) when is_map(link_map),
-    do: link_map["url"] || "" |> Shiori.Util.URL.valid?()
+  @spec valid?(__MODULE__) :: boolean()
+  def valid?(link) when is_struct(link),
+    do: (link.url || "") |> Shiori.Util.URL.valid?()
 
   @doc """
   Returns true when the links URL matches a valid
   URL pattern.
   """
-  @spec valid?(__MODULE__) :: boolean()
-  def valid?(link) when is_struct(link),
-    do: link.url || "" |> Shiori.Util.URL.valid?()
+  @spec valid?(map()) :: boolean()
+  def valid?(link_map) when is_map(link_map) and not is_struct(link_map),
+    do: (link_map["url"] || "") |> Shiori.Util.URL.valid?()
 end
